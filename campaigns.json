@@ -1,0 +1,135 @@
+[
+  {
+    "id": "skillup-202604",
+    "title": "【復刻】スキルアップキャンペーン",
+    "description": "対象のITスキルを習得して、つぶやきを投稿した方にリベポイントをプレゼント！",
+    "rewardDetail": "1スキルにつき50pt（挑戦＋投稿で達成）。4スキル全達成で最大200pt。予算に達し次第終了の可能性あり。つぶやき確認後1週間以内に付与。",
+    "icon": "💻",
+    "color": "blue",
+    "period": { "start": "2026-04-08", "end": "2026-05-31" },
+    "reward": "最大200pt",
+    "url": "https://libecity.com/room_list?room_id=Liberal-City&comment_id=GzNcUY5T44li4PbZqzxC",
+    "targetAudience": "リベシティ会員（新入生・こども会員も対象）",
+    "tasks": [
+      { "id": "flick", "label": "フリック入力（50pt）", "sub": "①「フリックとローマジ」で100pt以上獲得 ② #スキルアップ_フリック入力 でつぶやき投稿（スコアSS＋感想）" },
+      { "id": "perplexity", "label": "Perplexity AIで検索（50pt）", "sub": "① 学長ライブ等の内容をPerplexity AIで調べる ② #スキルアップ_PerplexityAI でつぶやき投稿（検索結果SS＋感想）" },
+      { "id": "nanobana", "label": "Nano Bananaで画像生成（50pt）", "sub": "① 画像生成AIでプロフィール画像を生成 ② #スキルアップ_NanoBanana でつぶやき投稿（生成画像＋感想）" },
+      { "id": "ovice", "label": "oviceの設定・操作（50pt）", "sub": "①【1F】初心者スペースで設定変更〜リアクション操作 ② #スキルアップ_ovice でつぶやき投稿（oviceのSS＋感想）" }
+    ]
+  },
+  {
+    "id": "claude-share-202604",
+    "title": "エージェント型AI 活用事例シェア祭り",
+    "description": "Claude Code・Coworkの活用事例をシェアすると、リベポイント＋豪華賞品！",
+    "rewardDetail": "参加賞: 投稿1回50pt（最大5回250pt）、投稿から5日程度で付与。TOP3: 金賞10万pt＋ぬいぐるみ、銀賞5万pt、銅賞3万pt。入賞15名: 各1万pt。投票参加: 抽選30名に1,000pt。",
+    "icon": "🤖",
+    "color": "purple",
+    "period": { "start": "2026-04-06", "end": "2026-04-30" },
+    "reward": "参加賞250pt＋TOP3最大10万pt",
+    "url": "",
+    "targetAudience": "リベシティ会員（新入生・こども会員も対象）",
+    "tasks": [
+      { "id": "claude-share-1", "label": "活用事例を1件投稿する（50pt）", "sub": "#エージェント型AI活用事例 + 使ったツール + 活用事例をつぶやき投稿" },
+      { "id": "claude-share-2", "label": "活用事例を2件目投稿する（50pt）", "sub": "" },
+      { "id": "claude-share-3", "label": "活用事例を3件目投稿する（50pt）", "sub": "" },
+      { "id": "claude-share-4", "label": "活用事例を4件目投稿する（50pt）", "sub": "" },
+      { "id": "claude-share-5", "label": "活用事例を5件目投稿する（50pt）MAX!", "sub": "これで参加賞の上限250ptに到達！" },
+      { "id": "claude-vote", "label": "活用事例に投票する（抽選1,000pt）", "sub": "投票フォームから投票。5つ以上投票で当選率UP。投票期限: 5/3まで" }
+    ]
+  },
+  {
+    "id": "knowhow-library-202604",
+    "title": "ノウハウ図書館 記事投稿応援キャンペーン",
+    "description": "ノウハウ図書館に記事を投稿してリベポイントをゲット！好評につき3月から延長。",
+    "rewardDetail": "①ポイント増量: 4月分の獲得ポイントが通常月より増量。②人気記事: いいね10件以上→1,000pt、50件以上→さらに1,000pt（最大2,000pt、1記事のみ）。③初投稿応援: 初投稿＋いいね1件以上で500pt。",
+    "icon": "📚",
+    "color": "orange",
+    "period": { "start": "2026-04-01", "end": "2026-04-30" },
+    "reward": "増量＋最大2,000pt＋初投稿500pt",
+    "url": "",
+    "targetAudience": "応援会員・中学生以上のこども会員（新入生・小学生以下は対象外）",
+    "tasks": [
+      { "id": "knowhow-post", "label": "ノウハウ図書館に記事を投稿する", "sub": "閲覧数・いいね数に応じて増量ポイント付与（5/10付与）" },
+      { "id": "knowhow-likes10", "label": "いいね10件以上を目指す（+1,000pt）", "sub": "5/5時点のいいね数で判定、数日以内に付与" },
+      { "id": "knowhow-likes50", "label": "いいね50件以上を目指す（+1,000pt）", "sub": "10件と合わせて最大2,000pt。最もいいねが多い1記事のみ対象" }
+    ]
+  },
+  {
+    "id": "2week-challenge-202604",
+    "title": "学長ミッション特別編 2週間チャレンジ",
+    "description": "チャレンジ成功で、限定ぬいぐるみ＆ポイントゲット！",
+    "rewardDetail": "",
+    "icon": "🏆",
+    "color": "yellow",
+    "period": { "start": "2026-04-01", "end": "2026-04-30" },
+    "reward": "限定ぬいぐるみ＋ポイント",
+    "url": "",
+    "targetAudience": "リベシティ会員",
+    "tasks": [
+      { "id": "2week-start", "label": "2週間チャレンジに参加登録する", "sub": "" },
+      { "id": "2week-complete", "label": "チャレンジを達成する", "sub": "" }
+    ]
+  },
+  {
+    "id": "pointback-202604",
+    "title": "市場リリース記念！ポイントバック祭り",
+    "description": "対象サービスの利用で最大20%還元！3/31〜4/30の支払い完了分が対象。",
+    "rewardDetail": "3/31〜4/30に支払い完了した取引が対象。申請期限: 4/30 23:59まで。予算に達し次第終了の可能性あり。",
+    "icon": "🎉",
+    "color": "mint",
+    "period": { "start": "2026-03-31", "end": "2026-04-30" },
+    "reward": "最大20%還元",
+    "url": "",
+    "targetAudience": "リベシティ会員",
+    "tasks": [
+      { "id": "pointback-use", "label": "対象の関連サービスを利用・支払い完了する", "sub": "3/31〜4/30の期間に支払い完了した取引が対象" },
+      { "id": "pointback-apply", "label": "申請フォームからポイントバック申請する", "sub": "申請期限: 4/30 23:59まで" }
+    ]
+  },
+  {
+    "id": "kuji-202604",
+    "title": "リベポイントを使って参加！くじ引きキャンペーン",
+    "description": "リベポイントを使うとくじが引ける！予算に達し次第終了。",
+    "rewardDetail": "",
+    "icon": "🎰",
+    "color": "pink",
+    "period": { "start": "2026-04-01", "end": "2026-04-30" },
+    "reward": "くじ景品",
+    "url": "",
+    "targetAudience": "リベシティ会員",
+    "tasks": [
+      { "id": "kuji-participate", "label": "くじ引きに参加する", "sub": "予算に達し次第、早期終了の可能性あり" }
+    ]
+  },
+  {
+    "id": "bokifp-202604",
+    "title": "簿記＆FP祭り",
+    "description": "4月末まで簿記＆FP祭り開催中！",
+    "rewardDetail": "",
+    "icon": "📝",
+    "color": "green",
+    "period": { "start": "2026-04-01", "end": "2026-04-30" },
+    "reward": "ポイント進呈",
+    "url": "",
+    "targetAudience": "リベシティ会員",
+    "tasks": [
+      { "id": "bokifp-participate", "label": "簿記＆FP祭りに参加する", "sub": "" }
+    ]
+  },
+  {
+    "id": "expense-tool-202604",
+    "title": "支出管理ツール＆つぶやきでポイントGet",
+    "description": "新リリースの支出管理・ライフプランツールを使って家計の現在地をチェック！",
+    "rewardDetail": "",
+    "icon": "💰",
+    "color": "mint",
+    "period": { "start": "2026-04-01", "end": "2026-04-30" },
+    "reward": "ポイント進呈",
+    "url": "",
+    "targetAudience": "リベシティ会員",
+    "tasks": [
+      { "id": "expense-use", "label": "支出管理ツールで家計状況を把握する", "sub": "" },
+      { "id": "expense-post", "label": "つぶやきを投稿する", "sub": "" }
+    ]
+  }
+]

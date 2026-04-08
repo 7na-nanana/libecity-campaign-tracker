@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LibeCity Campaign Tracker</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Zen+Maru+Gothic:wght@400;500;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --pink: #FF6B9D;
+  --pink-light: #FFE0EC;
+  --pink-bg: #FFF5F7;
+  --yellow: #FFD93D;
+  --yellow-light: #FFF8E1;
+  --mint: #7FDBCA;
+  --mint-light: #E0F7F1;
+  --purple: #B388FF;
+  --purple-light: #EDE7F6;
+  --blue: #64B5F6;
+  --blue-light: #E3F2FD;
+  --orange: #FFB74D;
+  --orange-light: #FFF3E0;
+  --green: #81C784;
+  --green-light: #E8F5E9;
+  --red: #FF6B6B;
+  --red-light: #FFE0E0;
+  --gray: #9E9E9E;
+  --gray-light: #F5F5F5;
+  --text: #424242;
+  --text-light: #757575;
+  --white: #FFFFFF;
+  --shadow: 0 4px 15px rgba(255, 107, 157, 0.15);
+  --shadow-hover: 0 8px 25px rgba(255, 107, 157, 0.25);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+body {
+  font-family: 'Zen Maru Gothic', 'Nunito', sans-serif;
+  background: var(--pink-bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+/* ===== Header ===== */
+.header {
+  background: linear-gradient(135deg, var(--pink) 0%, var(--purple) 100%);
+  padding: 24px 16px 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.header::before {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 120px; height: 120px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+}
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: -20px; left: 20px;
+  width: 80px; height: 80px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 50%;
+}
+.header h1 {
+  color: var(--white);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.header .subtitle {
+  color: rgba(255,255,255,0.9);
+  font-size: 13px;
+  margin-top: 4px;
+}
+.header .stats-bar {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+.header .stat-badge {
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 6px 14px;
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 600;
+}
+.header .stat-badge span {
+  font-size: 17px;
+  font-weight: 800;
+}
+.stat-badge.in-progress { background: rgba(255,217,61,0.4); }
+.stat-badge.done-stat { background: rgba(129,199,132,0.4); }
+
+/* ===== Filter tabs ===== */
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.filter-btn {
+  flex-shrink: 0;
+  border: none;
+  background: var(--white);
+  color: var(--text-light);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: all 0.2s;
+}
+.filter-btn.active {
+  background: var(--pink);
+  color: var(--white);
+  box-shadow: 0 3px 12px rgba(255,107,157,0.3);
+}
+.filter-btn:hover { transform: translateY(-1px); }
+
+/* ===== Campaign Card ===== */
+.campaign-list {
+  padding: 0 12px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+.campaign-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+  transition: all 0.3s;
+  border: 2px solid transparent;
+}
+.campaign-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+.campaign-card.completed {
+  border-color: var(--green);
+}
+.campaign-card.warning {
+  border-color: var(--red);
+}
+.campaign-card.expired {
+  opacity: 0.5;
+  filter: grayscale(0.5);
+}
+
+/* Card Header */
+.card-header {
+  padding: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+.card-info {
+  flex: 1;
+  min-width: 0;
+}
+.card-title {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+.card-desc {
+  font-size: 12px;
+  color: var(--text-light);
+  line-height: 1.5;
+}
+.card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.meta-tag {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+.meta-tag.period {
+  background: var(--blue-light);
+  color: var(--blue);
+}
+.meta-tag.reward {
+  background: var(--yellow-light);
+  color: #F59E0B;
+}
+.meta-tag.deadline-warn {
+  background: var(--red-light);
+  color: var(--red);
+  animation: pulse-warn 1.5s ease-in-out infinite;
+}
+@keyframes pulse-warn {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+.meta-tag.done-tag {
+  background: var(--green-light);
+  color: var(--green);
+}
+
+/* Reward detail */
+.reward-detail {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: var(--yellow-light);
+  border-radius: 8px;
+  line-height: 1.6;
+}
+
+/* Progress bar */
+.progress-wrap {
+  padding: 0 16px 12px;
+}
+.progress-bar {
+  height: 8px;
+  background: var(--gray-light);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--pink), var(--purple));
+  transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+.progress-fill.complete {
+  background: linear-gradient(90deg, var(--green), var(--mint));
+}
+.progress-text {
+  font-size: 11px;
+  color: var(--text-light);
+  text-align: right;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+/* Card Body (expandable) */
+.card-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+.card-body.open {
+  max-height: 2000px;
+}
+.card-body-inner {
+  padding: 0 16px 16px;
+  border-top: 1px dashed var(--pink-light);
+}
+
+/* Task item */
+.task-group-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--pink);
+  margin: 14px 0 8px;
+  padding-left: 2px;
+}
+.task-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--pink-bg);
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+  transition: all 0.25s;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.task-item:hover { background: var(--pink-light); }
+.task-item:active { transform: scale(0.98); }
+/* In Progress state */
+.task-item.in-progress {
+  background: var(--yellow-light);
+}
+.task-item.in-progress:hover {
+  background: #FFF0C2;
+}
+.task-item.in-progress .task-label {
+  color: #E65100;
+  font-weight: 600;
+}
+/* Done state */
+.task-item.done {
+  background: var(--green-light);
+}
+.task-item.done:hover {
+  background: #C8E6C9;
+}
+.task-item.done .task-label {
+  text-decoration: line-through;
+  color: var(--gray);
+}
+.task-checkbox {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 2px solid var(--pink);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s;
+  margin-top: 1px;
+  position: relative;
+}
+/* In Progress checkbox: yellow with arrow */
+.task-item.in-progress .task-checkbox {
+  background: var(--yellow);
+  border-color: var(--yellow);
+}
+.task-item.in-progress .task-checkbox::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border: solid var(--white);
+  border-width: 2.5px 2.5px 0 0;
+  transform: rotate(45deg) scale(1) translateX(-1px);
+  transition: transform 0.2s;
+}
+/* Done checkbox: green with check */
+.task-item.done .task-checkbox {
+  background: var(--green);
+  border-color: var(--green);
+}
+.task-item.done .task-checkbox::after {
+  content: '';
+  width: 6px;
+  height: 10px;
+  border: solid var(--white);
+  border-width: 0 2.5px 2.5px 0;
+  transform: rotate(45deg) scale(1);
+  transition: transform 0.2s;
+}
+/* Status label */
+.task-status-label {
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 6px;
+  padding: 1px 6px;
+  margin-left: 6px;
+  display: inline-block;
+  vertical-align: middle;
+}
+.task-status-label.wip {
+  background: var(--yellow);
+  color: #7B5800;
+}
+.task-status-label.completed {
+  background: var(--green);
+  color: var(--white);
+}
+.task-label {
+  font-size: 13px;
+  line-height: 1.5;
+  flex: 1;
+  transition: all 0.25s;
+}
+.task-sub {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+
+/* Link button */
+.card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 10px;
+  padding: 6px 14px;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  color: var(--white);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.card-link:hover { opacity: 0.85; transform: scale(1.03); }
+
+/* Toggle arrow */
+.toggle-arrow {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--gray);
+  transition: transform 0.3s;
+  font-size: 14px;
+  align-self: center;
+}
+.campaign-card.open .toggle-arrow {
+  transform: rotate(180deg);
+}
+
+/* ===== Confetti Canvas ===== */
+#confetti-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ===== Empty state ===== */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-light);
+}
+.empty-state .emoji { font-size: 48px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; }
+
+/* ===== Toast ===== */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: linear-gradient(135deg, var(--green), var(--mint));
+  color: var(--white);
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 6px 20px rgba(129, 199, 132, 0.4);
+  z-index: 9998;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  white-space: nowrap;
+}
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ===== Responsive ===== */
+@media (min-width: 640px) {
+  .header h1 { font-size: 26px; }
+  .campaign-list { padding: 0 20px; }
+  .card-header { padding: 20px; }
+  .card-title { font-size: 17px; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<div class="header">
+  <h1>Campaign Tracker</h1>
+  <div class="subtitle">LibeCity Campaigns</div>
+  <div class="stats-bar">
+    <div class="stat-badge" id="stat-active">Active <span>0</span></div>
+    <div class="stat-badge in-progress" id="stat-progress">In Progress <span>0</span></div>
+    <div class="stat-badge done-stat" id="stat-done">Done <span>0</span></div>
+  </div>
+</div>
+
+<div class="filter-bar" id="filter-bar">
+  <button class="filter-btn active" data-filter="all">All</button>
+  <button class="filter-btn" data-filter="active">Active</button>
+  <button class="filter-btn" data-filter="in-progress">In Progress</button>
+  <button class="filter-btn" data-filter="completed">Completed</button>
+  <button class="filter-btn" data-filter="warning">Deadline Soon</button>
+</div>
+
+<div class="campaign-list" id="campaign-list"></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================
+// Campaign Data (loaded from campaigns.json)
+// ============================================
+const COLOR_MAP = {
+  pink:   { color: 'var(--pink)',   light: 'var(--pink-light)' },
+  purple: { color: 'var(--purple)', light: 'var(--purple-light)' },
+  blue:   { color: 'var(--blue)',   light: 'var(--blue-light)' },
+  orange: { color: 'var(--orange)', light: 'var(--orange-light)' },
+  yellow: { color: 'var(--yellow)', light: 'var(--yellow-light)' },
+  mint:   { color: 'var(--mint)',   light: 'var(--mint-light)' },
+  green:  { color: 'var(--green)',  light: 'var(--green-light)' },
+  red:    { color: 'var(--red)',    light: 'var(--red-light)' }
+};
+const ICON_COLORS = ['pink', 'purple', 'blue', 'orange', 'yellow', 'mint'];
+
+let CAMPAIGNS = [];
+
+const CAMPAIGNS_FALLBACK = [
+  {
+    id: "skillup-202604",
+    title: "【復刻】スキルアップキャンペーン",
+    description: "対象のITスキルを習得して、つぶやきを投稿した方にリベポイントをプレゼント！",
+    rewardDetail: "1スキルにつき最大50pt（挑戦＋投稿で達成）。4スキル全達成で最大200pt。予算に達し次第終了の可能性あり。",
+    icon: "💻",
+    color: "var(--blue)",
+    colorLight: "var(--blue-light)",
+    period: { start: "2026-04-08", end: "2026-05-31" },
+    reward: "最大200pt",
+    url: "https://libecity.com/room_list?room_id=Liberal-City&comment_id=GzNcUY5T44li4PbZqzxC",
+    targetAudience: "リベシティ会員（新入生・こども会員も対象）",
+    tasks: [
+      {
+        id: "flick-challenge",
+        label: "フリック入力：「フリックとローマジ」で100pt以上獲得",
+        sub: "宿題リストでは120ptだが本キャンペーンでは100ptでOK"
+      },
+      {
+        id: "flick-post",
+        label: "フリック入力：#スキルアップ_フリック入力 でつぶやき投稿",
+        sub: "スコアのスクリーンショット＋挑戦した感想"
+      },
+      {
+        id: "perplexity-challenge",
+        label: "Perplexity AI：学長ライブ等の内容をPerplexity AIで調べる",
+        sub: ""
+      },
+      {
+        id: "perplexity-post",
+        label: "Perplexity AI：#スキルアップ_PerplexityAI でつぶやき投稿",
+        sub: "検索結果のスクリーンショット＋挑戦した感想"
+      },
+      {
+        id: "nanobana-challenge",
+        label: "Nano Banana：画像生成AIでプロフィール画像を生成",
+        sub: ""
+      },
+      {
+        id: "nanobana-post",
+        label: "Nano Banana：#スキルアップ_NanoBanana でつぶやき投稿",
+        sub: "生成したプロフィール画像＋挑戦した感想"
+      },
+      {
+        id: "ovice-challenge",
+        label: "ovice：【1F】初心者スペースで設定変更〜リアクション操作",
+        sub: ""
+      },
+      {
+        id: "ovice-post",
+        label: "ovice：#スキルアップ_ovice でつぶやき投稿",
+        sub: "oviceにいる様子のスクリーンショット＋挑戦した感想"
+      }
+    ]
+  },
+  {
+    id: "claude-share-202604",
+    title: "エージェント型AI 活用事例シェア祭り",
+    description: "Claude Code・Coworkの活用事例をシェアすると、リベポイントをプレゼント！",
+    rewardDetail: "参加賞：投稿1回につき50pt（最大5回250ptまで）。投稿から5日程度でポイント付与。優秀賞あり（最大10万pt）。",
+    icon: "🤖",
+    color: "var(--purple)",
+    colorLight: "var(--purple-light)",
+    period: { start: "2026-04-01", end: "2026-04-30" },
+    reward: "1投稿50pt（最大250pt）＋優秀賞",
+    url: "",
+    targetAudience: "リベシティ会員",
+    tasks: [
+      {
+        id: "claude-share-1",
+        label: "活用事例を1件投稿する（50pt）",
+        sub: "活用内容＋スクリーンショットをつぶやきに投稿"
+      },
+      {
+        id: "claude-share-2",
+        label: "活用事例を2件目投稿する（50pt）",
+        sub: ""
+      },
+      {
+        id: "claude-share-3",
+        label: "活用事例を3件目投稿する（50pt）",
+        sub: ""
+      },
+      {
+        id: "claude-share-4",
+        label: "活用事例を4件目投稿する（50pt）",
+        sub: ""
+      },
+      {
+        id: "claude-share-5",
+        label: "活用事例を5件目投稿する（50pt）MAX!",
+        sub: "これで参加賞の上限250ptに到達！"
+      }
+    ]
+  },
+  {
+    id: "knowhow-library-202604",
+    title: "ノウハウ図書館 記事投稿応援キャンペーン",
+    description: "ノウハウ図書館に記事を投稿してリベポイントをゲット！",
+    rewardDetail: "閲覧数や「いいね」数に応じてポイント付与。4月分は通常月よりもポイント増量！",
+    icon: "📚",
+    color: "var(--orange)",
+    colorLight: "var(--orange-light)",
+    period: { start: "2026-04-01", end: "2026-04-30" },
+    reward: "ポイント増量中",
+    url: "",
+    targetAudience: "リベシティ会員",
+    tasks: [
+      {
+        id: "knowhow-post",
+        label: "ノウハウ図書館に記事を投稿する",
+        sub: "閲覧数・いいね数に応じて増量ポイント付与"
+      }
+    ]
+  },
+  {
+    id: "2week-challenge-202604",
+    title: "学長ミッション特別編 2週間チャレンジ",
+    description: "チャレンジ成功で、限定ぬいぐるみ＆ポイントゲット！",
+    rewardDetail: "",
+    icon: "🏆",
+    color: "var(--yellow)",
+    colorLight: "var(--yellow-light)",
+    period: { start: "2026-04-01", end: "2026-04-30" },
+    reward: "限定ぬいぐるみ＋ポイント",
+    url: "",
+    targetAudience: "リベシティ会員",
+    tasks: [
+      {
+        id: "2week-start",
+        label: "2週間チャレンジに参加登録する",
+        sub: ""
+      },
+      {
+        id: "2week-complete",
+        label: "チャレンジを達成する",
+        sub: ""
+      }
+    ]
+  },
+  {
+    id: "pointback-202604",
+    title: "市場リリース記念！ポイントバック祭り",
+    description: "対象サービスの利用で最大20%還元！",
+    rewardDetail: "",
+    icon: "🎉",
+    color: "var(--mint)",
+    colorLight: "var(--mint-light)",
+    period: { start: "2026-04-01", end: "2026-04-30" },
+    reward: "最大20%還元",
+    url: "",
+    targetAudience: "リベシティ会員",
+    tasks: [
+      {
+        id: "pointback-use",
+        label: "対象サービスを利用する",
+        sub: ""
+      },
+      {
+        id: "pointback-apply",
+        label: "ポイントバック申請を行う",
+        sub: ""
+      }
+    ]
+  },
+  {
+    id: "kuji-202604",
+    title: "リベポイントを使って参加！くじ引きキャンペーン",
+    description: "リベポイントを使うとくじが引ける！",
+    rewardDetail: "",
+    icon: "🎰",
+    color: "var(--pink)",
+    colorLight: "var(--pink-light)",
+    period: { start: "2026-04-01", end: "2026-04-30" },
+    reward: "くじ景品",
+    url: "",
+    targetAudience: "リベシティ会員",
+    tasks: [
+      {
+        id: "kuji-participate",
+        label: "くじ引きに参加する",
+        sub: ""
+      }
+    ]
+  }
+];
+
+// If JSON load failed, use fallback
+async function loadCampaignsWithFallback() {
+  try {
+    const res = await fetch('campaigns.json?t=' + Date.now());
+    const data = await res.json();
+    CAMPAIGNS = data.map(function(c, i) {
+      var colorKey = c.color || ICON_COLORS[i % ICON_COLORS.length];
+      var cm = COLOR_MAP[colorKey] || COLOR_MAP.pink;
+      return Object.assign({}, c, { color: cm.color, colorLight: cm.light });
+    });
+  } catch (e) {
+    console.warn('campaigns.json not found, using fallback data');
+    CAMPAIGNS = CAMPAIGNS_FALLBACK.map(function(c, i) {
+      var colorKey = c.color || ICON_COLORS[i % ICON_COLORS.length];
+      var cm = COLOR_MAP[colorKey] || COLOR_MAP.pink;
+      return Object.assign({}, c, { color: cm.color, colorLight: cm.light });
+    });
+  }
+  render();
+}
+
+// ============================================
+// State Management
+// ============================================
+const STORAGE_KEY = 'libecity-campaign-tracker';
+
+function loadState() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+  } catch { return {}; }
+}
+
+function saveState(state) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+// Task states: 0 = not started, 1 = in progress, 2 = done
+
+// Normalize a raw value from storage to 0/1/2
+function normalizeTaskVal(val) {
+  if (val === true) return 2;   // migrate old boolean
+  if (val === 1 || val === 2) return val;
+  return 0;
+}
+
+function getTaskState(campaignId, taskId) {
+  var state = loadState();
+  if (!state[campaignId]) return 0;
+  return normalizeTaskVal(state[campaignId][taskId]);
+}
+
+function cycleTaskState(campaignId, taskId) {
+  var state = loadState();
+  if (!state[campaignId]) state[campaignId] = {};
+
+  // Migrate ALL tasks in this campaign to numbers (fix old boolean values)
+  var tasks = state[campaignId];
+  for (var key in tasks) {
+    tasks[key] = normalizeTaskVal(tasks[key]);
+  }
+
+  var current = normalizeTaskVal(tasks[taskId]);
+  var next = (current + 1) % 3; // 0 -> 1 -> 2 -> 0
+  tasks[taskId] = next;
+  saveState(state);
+  return next;
+}
+
+function getCampaignProgress(campaign) {
+  const total = campaign.tasks.length;
+  const done = campaign.tasks.filter(t => getTaskState(campaign.id, t.id) === 2).length;
+  const inProgress = campaign.tasks.filter(t => getTaskState(campaign.id, t.id) === 1).length;
+  return {
+    done, inProgress, total,
+    percent: total ? Math.round((done / total) * 100) : 0,
+    started: done + inProgress > 0
+  };
+}
+
+// ============================================
+// Date helpers
+// ============================================
+function getDaysRemaining(endDate) {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  const end = new Date(endDate);
+  end.setHours(0, 0, 0, 0);
+  return Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+}
+
+function formatPeriod(period) {
+  const s = new Date(period.start);
+  const e = new Date(period.end);
+  const fmt = d => `${d.getMonth() + 1}/${d.getDate()}`;
+  return `${fmt(s)} 〜 ${fmt(e)}`;
+}
+
+function isExpired(endDate) {
+  return getDaysRemaining(endDate) < 0;
+}
+
+function isDeadlineSoon(endDate) {
+  const days = getDaysRemaining(endDate);
+  return days >= 0 && days <= 7;
+}
+
+// ============================================
+// Confetti
+// ============================================
+function launchConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const colors = ['#FF6B9D', '#FFD93D', '#7FDBCA', '#B388FF', '#64B5F6', '#FF6B6B', '#81C784', '#FFB74D'];
+  const particles = [];
+
+  for (let i = 0; i < 150; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random() * 200,
+      w: 6 + Math.random() * 6,
+      h: 4 + Math.random() * 4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vx: (Math.random() - 0.5) * 4,
+      vy: 2 + Math.random() * 4,
+      rotation: Math.random() * 360,
+      rotSpeed: (Math.random() - 0.5) * 10,
+      opacity: 1
+    });
+  }
+
+  let frame = 0;
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let alive = false;
+    particles.forEach(p => {
+      if (p.opacity <= 0) return;
+      alive = true;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.05;
+      p.rotation += p.rotSpeed;
+      if (p.y > canvas.height + 20) p.opacity -= 0.02;
+      if (frame > 100) p.opacity -= 0.01;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.rotation * Math.PI) / 180);
+      ctx.globalAlpha = Math.max(0, p.opacity);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+    frame++;
+    if (alive) requestAnimationFrame(animate);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  animate();
+}
+
+function playCompleteSound() {
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const notes = [523.25, 659.25, 783.99, 1046.50];
+    notes.forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.15, audioCtx.currentTime + i * 0.12);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.12 + 0.5);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(audioCtx.currentTime + i * 0.12);
+      osc.stop(audioCtx.currentTime + i * 0.12 + 0.5);
+    });
+  } catch (e) { /* audio not supported */ }
+}
+
+// ============================================
+// Toast
+// ============================================
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// ============================================
+// Rendering
+// ============================================
+let currentFilter = 'all';
+const openCards = new Set();
+
+function updateStats() {
+  const allActive = CAMPAIGNS.filter(c => !isExpired(c.period.end));
+  const allDone = CAMPAIGNS.filter(c => getCampaignProgress(c).percent === 100);
+  const allInProgress = CAMPAIGNS.filter(c => {
+    const p = getCampaignProgress(c);
+    return p.started && p.percent < 100 && !isExpired(c.period.end);
+  });
+  document.querySelector('#stat-active span').textContent = allActive.length;
+  document.querySelector('#stat-progress span').textContent = allInProgress.length;
+  document.querySelector('#stat-done span').textContent = allDone.length;
+}
+
+function render() {
+  const list = document.getElementById('campaign-list');
+  let campaigns = CAMPAIGNS.filter(c => !isExpired(c.period.end) || getCampaignProgress(c).percent > 0);
+
+  // Sort: warning first, then active, then completed
+  campaigns.sort((a, b) => {
+    const pa = getCampaignProgress(a);
+    const pb = getCampaignProgress(b);
+    const aCompleted = pa.percent === 100;
+    const bCompleted = pb.percent === 100;
+    if (aCompleted !== bCompleted) return aCompleted ? 1 : -1;
+    const aWarn = isDeadlineSoon(a.period.end) && !aCompleted;
+    const bWarn = isDeadlineSoon(b.period.end) && !bCompleted;
+    if (aWarn !== bWarn) return aWarn ? -1 : 1;
+    return getDaysRemaining(a.period.end) - getDaysRemaining(b.period.end);
+  });
+
+  // Filter
+  if (currentFilter === 'active') {
+    campaigns = campaigns.filter(c => getCampaignProgress(c).percent < 100 && !isExpired(c.period.end));
+  } else if (currentFilter === 'completed') {
+    campaigns = campaigns.filter(c => getCampaignProgress(c).percent === 100);
+  } else if (currentFilter === 'warning') {
+    campaigns = campaigns.filter(c => isDeadlineSoon(c.period.end) && getCampaignProgress(c).percent < 100);
+  } else if (currentFilter === 'in-progress') {
+    campaigns = campaigns.filter(c => {
+      const p = getCampaignProgress(c);
+      return p.started && p.percent < 100 && !isExpired(c.period.end);
+    });
+  }
+
+  updateStats();
+
+  if (campaigns.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="emoji">' +
+      (currentFilter === 'completed' ? '🎯' : currentFilter === 'warning' ? '✨' : currentFilter === 'in-progress' ? '🚀' : '🌸') +
+      '</div><p>' +
+      (currentFilter === 'completed' ? 'まだ完了したキャンペーンはありません' :
+       currentFilter === 'warning' ? '期限が近いキャンペーンはありません！' :
+       currentFilter === 'in-progress' ? 'まだ着手中のキャンペーンはありません' :
+       '表示するキャンペーンがありません') +
+      '</p></div>';
+    return;
+  }
+
+  list.innerHTML = campaigns.map(c => {
+    const prog = getCampaignProgress(c);
+    const expired = isExpired(c.period.end);
+    const deadlineSoon = isDeadlineSoon(c.period.end);
+    const completed = prog.percent === 100;
+    const daysLeft = getDaysRemaining(c.period.end);
+    const isOpen = openCards.has(c.id);
+
+    const cardClasses = ['campaign-card'];
+    if (completed) cardClasses.push('completed');
+    if (deadlineSoon && !completed) cardClasses.push('warning');
+    if (expired) cardClasses.push('expired');
+    if (isOpen) cardClasses.push('open');
+
+    let deadlineTag = '';
+    if (completed) {
+      deadlineTag = '<span class="meta-tag done-tag">Complete!</span>';
+    } else if (expired) {
+      deadlineTag = '<span class="meta-tag deadline-warn">期限切れ</span>';
+    } else if (deadlineSoon) {
+      deadlineTag = '<span class="meta-tag deadline-warn">残り' + daysLeft + '日!</span>';
+    }
+
+    const rewardDetailHtml = c.rewardDetail
+      ? '<div class="reward-detail">' + c.rewardDetail + '</div>'
+      : '';
+
+    const tasksHtml = c.tasks.map(t => {
+      const taskState = getTaskState(c.id, t.id);
+      const stateClass = taskState === 1 ? ' in-progress' : taskState === 2 ? ' done' : '';
+      const statusLabel = taskState === 1 ? ' <span class="task-status-label wip">WIP</span>'
+                        : taskState === 2 ? ' <span class="task-status-label completed">DONE</span>'
+                        : '';
+      return '<div class="task-item' + stateClass + '" data-campaign="' + c.id + '" data-task="' + t.id + '">' +
+        '<div class="task-checkbox"></div>' +
+        '<div>' +
+          '<div class="task-label">' + t.label + statusLabel + '</div>' +
+          (t.sub ? '<div class="task-sub">' + t.sub + '</div>' : '') +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    const linkHtml = c.url
+      ? '<a href="' + c.url + '" target="_blank" class="card-link" onclick="event.stopPropagation()">Details →</a>'
+      : '';
+
+    return '<div class="' + cardClasses.join(' ') + '" data-id="' + c.id + '">' +
+      '<div class="card-header" data-toggle="' + c.id + '">' +
+        '<div class="card-icon" style="background:' + c.colorLight + ';color:' + c.color + '">' + c.icon + '</div>' +
+        '<div class="card-info">' +
+          '<div class="card-title">' + c.title + '</div>' +
+          '<div class="card-desc">' + c.description + '</div>' +
+          '<div class="card-meta">' +
+            '<span class="meta-tag period">' + formatPeriod(c.period) + '</span>' +
+            '<span class="meta-tag reward">' + c.reward + '</span>' +
+            deadlineTag +
+          '</div>' +
+        '</div>' +
+        '<div class="toggle-arrow">▼</div>' +
+      '</div>' +
+      '<div class="progress-wrap">' +
+        '<div class="progress-bar">' +
+          '<div class="progress-fill' + (completed ? ' complete' : '') + '" style="width:' + prog.percent + '%"></div>' +
+        '</div>' +
+        '<div class="progress-text">' + (prog.inProgress > 0 ? prog.inProgress + ' WIP / ' : '') + prog.done + ' Done / ' + prog.total + '</div>' +
+      '</div>' +
+      '<div class="card-body' + (isOpen ? ' open' : '') + '">' +
+        '<div class="card-body-inner">' +
+          rewardDetailHtml +
+          '<div class="task-group-title">Tasks</div>' +
+          tasksHtml +
+          linkHtml +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+// ============================================
+// Event Delegation (reliable click handling)
+// ============================================
+document.getElementById('campaign-list').addEventListener('click', function(e) {
+  // Check if a task-item was clicked
+  const taskEl = e.target.closest('.task-item');
+  if (taskEl) {
+    e.stopPropagation();
+    const campaignId = taskEl.dataset.campaign;
+    const taskId = taskEl.dataset.task;
+    const newState = cycleTaskState(campaignId, taskId);
+    const campaign = CAMPAIGNS.find(c => c.id === campaignId);
+    const prog = getCampaignProgress(campaign);
+
+    render();
+
+    if (newState === 2 && prog.percent === 100) {
+      setTimeout(function() {
+        launchConfetti();
+        playCompleteSound();
+        showToast(campaign.title + ' All Complete!!');
+      }, 200);
+    } else if (newState === 2) {
+      showToast(prog.done + '/' + prog.total + ' Done!');
+    } else if (newState === 1) {
+      showToast('WIP: ' + prog.inProgress + ' / Done: ' + prog.done);
+    }
+    return;
+  }
+
+  // Check if card header was clicked
+  const headerEl = e.target.closest('.card-header');
+  if (headerEl) {
+    const id = headerEl.dataset.toggle;
+    if (id) {
+      if (openCards.has(id)) openCards.delete(id);
+      else openCards.add(id);
+      render();
+    }
+    return;
+  }
+});
+
+// Filter
+document.getElementById('filter-bar').addEventListener('click', function(e) {
+  const btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  currentFilter = btn.dataset.filter;
+  render();
+});
+
+// Init
+loadCampaignsWithFallback();
+</script>
+</body>
+</html>
