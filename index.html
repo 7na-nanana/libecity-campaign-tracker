@@ -744,6 +744,73 @@ body {
 }
 .emoji-option:hover { background: var(--pink-light); }
 
+/* ===== Drag & Drop ===== */
+.drag-handle {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--gray);
+  font-size: 18px;
+  cursor: grab;
+  border-radius: 6px;
+  transition: all 0.2s;
+  align-self: center;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+.drag-handle:hover {
+  background: var(--gray-light);
+  color: var(--text-light);
+}
+.drag-handle:active {
+  cursor: grabbing;
+}
+.campaign-card.dragging {
+  opacity: 0.4;
+  transform: scale(0.97);
+  box-shadow: none;
+}
+.campaign-card.drag-over {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 2px var(--pink-light), var(--shadow-hover);
+}
+.campaign-card.drag-ghost {
+  position: fixed;
+  z-index: 10000;
+  pointer-events: none;
+  opacity: 0.9;
+  transform: scale(1.02) rotate(1deg);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+  width: calc(100% - 24px);
+  max-width: 576px;
+}
+.sort-reset-btn {
+  flex-shrink: 0;
+  border: none;
+  background: var(--white);
+  color: var(--text-light);
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: all 0.2s;
+  display: none;
+}
+.sort-reset-btn.visible {
+  display: block;
+}
+.sort-reset-btn:hover {
+  transform: translateY(-1px);
+  color: var(--pink);
+}
+
 /* ===== Responsive ===== */
 @media (min-width: 640px) {
   .header h1 { font-size: 26px; }
@@ -773,6 +840,7 @@ body {
   <button class="filter-btn" data-filter="in-progress">In Progress</button>
   <button class="filter-btn" data-filter="completed">Completed</button>
   <button class="filter-btn" data-filter="warning">Deadline Soon</button>
+  <button class="sort-reset-btn" id="sort-reset-btn" title="並び順をリセット">↻ 自動</button>
   <button class="add-btn" id="add-btn" title="キャンペーンを追加">＋</button>
 </div>
 
@@ -1290,11 +1358,40 @@ function updateStats() {
   document.querySelector('#stat-done span').textContent = allDone.length;
 }
 
-function render() {
-  const list = document.getElementById('campaign-list');
-  let campaigns = CAMPAIGNS.filter(c => !isExpired(c.period.end) || getCampaignProgress(c).percent > 0);
+// ============================================
+// Card Order (localStorage)
+// ============================================
+const ORDER_STORAGE_KEY = 'libecity-campaign-order';
 
-  // Sort: warning first, then active, then completed
+function loadCardOrder() {
+  try {
+    return JSON.parse(localStorage.getItem(ORDER_STORAGE_KEY)) || null;
+  } catch { return null; }
+}
+
+function saveCardOrder(idList) {
+  localStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(idList));
+  updateSortResetBtn();
+}
+
+function clearCardOrder() {
+  localStorage.removeItem(ORDER_STORAGE_KEY);
+  updateSortResetBtn();
+}
+
+function hasCustomOrder() {
+  return !!loadCardOrder();
+}
+
+function updateSortResetBtn() {
+  var btn = document.getElementById('sort-reset-btn');
+  if (btn) {
+    if (hasCustomOrder()) btn.classList.add('visible');
+    else btn.classList.remove('visible');
+  }
+}
+
+function defaultSort(campaigns) {
   campaigns.sort((a, b) => {
     const pa = getCampaignProgress(a);
     const pb = getCampaignProgress(b);
@@ -1306,6 +1403,26 @@ function render() {
     if (aWarn !== bWarn) return aWarn ? -1 : 1;
     return getDaysRemaining(a.period.end) - getDaysRemaining(b.period.end);
   });
+  return campaigns;
+}
+
+function render() {
+  const list = document.getElementById('campaign-list');
+  let campaigns = CAMPAIGNS.filter(c => !isExpired(c.period.end) || getCampaignProgress(c).percent > 0);
+
+  // Sort: use custom order if saved, else default auto-sort
+  var customOrder = loadCardOrder();
+  if (customOrder) {
+    var orderMap = {};
+    customOrder.forEach(function(id, i) { orderMap[id] = i; });
+    campaigns.sort(function(a, b) {
+      var ai = orderMap[a.id] !== undefined ? orderMap[a.id] : 9999;
+      var bi = orderMap[b.id] !== undefined ? orderMap[b.id] : 9999;
+      return ai - bi;
+    });
+  } else {
+    defaultSort(campaigns);
+  }
 
   // Filter
   if (currentFilter === 'active') {
@@ -1322,6 +1439,7 @@ function render() {
   }
 
   updateStats();
+  updateSortResetBtn();
 
   if (campaigns.length === 0) {
     list.innerHTML = '<div class="empty-state"><div class="emoji">' +
@@ -1381,8 +1499,9 @@ function render() {
       ? '<a href="' + c.url + '" target="_blank" class="card-link" onclick="event.stopPropagation()">Details →</a>'
       : '';
 
-    return '<div class="' + cardClasses.join(' ') + '" data-id="' + c.id + '">' +
+    return '<div class="' + cardClasses.join(' ') + '" data-id="' + c.id + '" draggable="true">' +
       '<div class="card-header" data-toggle="' + c.id + '">' +
+        '<div class="drag-handle" title="ドラッグで並び替え">☰</div>' +
         '<div class="card-icon" style="background:' + c.colorLight + ';color:' + c.color + '">' + c.icon + '</div>' +
         '<div class="card-info">' +
           '<div class="card-title">' + c.title + (c._custom ? '<span class="custom-badge">手動追加</span>' : '') + '</div>' +
@@ -1674,6 +1793,160 @@ document.getElementById('campaign-list').addEventListener('click', function(e) {
     deleteCampaign(deleteBtn.dataset.deleteId);
     return;
   }
+});
+
+// ============================================
+// Drag & Drop (Desktop + Touch)
+// ============================================
+(function initDragAndDrop() {
+  var list = document.getElementById('campaign-list');
+  var dragFromHandle = false;
+  var dragSrcId = null;
+
+  // Track mousedown on handle to allow drag only from handle
+  list.addEventListener('mousedown', function(e) {
+    var handle = e.target.closest('.drag-handle');
+    dragFromHandle = !!handle;
+  });
+
+  list.addEventListener('dragstart', function(e) {
+    var card = e.target.closest('.campaign-card');
+    if (!card || !dragFromHandle) {
+      e.preventDefault();
+      return;
+    }
+    dragSrcId = card.dataset.id;
+    card.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', card.dataset.id);
+    // Slight delay so the dragging class applies visually
+    setTimeout(function() { card.classList.add('dragging'); }, 0);
+  });
+
+  list.addEventListener('dragover', function(e) {
+    if (!dragSrcId) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    var card = e.target.closest('.campaign-card');
+    list.querySelectorAll('.campaign-card.drag-over').forEach(function(c) { c.classList.remove('drag-over'); });
+    if (card && card.dataset.id !== dragSrcId) {
+      card.classList.add('drag-over');
+    }
+  });
+
+  list.addEventListener('dragleave', function(e) {
+    var card = e.target.closest('.campaign-card');
+    if (card) card.classList.remove('drag-over');
+  });
+
+  list.addEventListener('drop', function(e) {
+    e.preventDefault();
+    list.querySelectorAll('.campaign-card.drag-over').forEach(function(c) { c.classList.remove('drag-over'); });
+    list.querySelectorAll('.campaign-card.dragging').forEach(function(c) { c.classList.remove('dragging'); });
+
+    var targetCard = e.target.closest('.campaign-card');
+    if (!targetCard || !dragSrcId || targetCard.dataset.id === dragSrcId) {
+      dragSrcId = null;
+      return;
+    }
+
+    applyReorder(dragSrcId, targetCard.dataset.id);
+    dragSrcId = null;
+  });
+
+  list.addEventListener('dragend', function() {
+    list.querySelectorAll('.campaign-card.dragging').forEach(function(c) { c.classList.remove('dragging'); });
+    list.querySelectorAll('.campaign-card.drag-over').forEach(function(c) { c.classList.remove('drag-over'); });
+    dragSrcId = null;
+    dragFromHandle = false;
+  });
+
+  // --- Touch Drag & Drop (Mobile) ---
+  var touchSrcId = null;
+  var touchStartY = 0;
+  var touchStarted = false;
+
+  list.addEventListener('touchstart', function(e) {
+    var handle = e.target.closest('.drag-handle');
+    if (!handle) return;
+    var card = handle.closest('.campaign-card');
+    if (!card) return;
+
+    touchSrcId = card.dataset.id;
+    touchStartY = e.touches[0].clientY;
+    touchStarted = false;
+  }, { passive: true });
+
+  list.addEventListener('touchmove', function(e) {
+    if (!touchSrcId) return;
+    var touch = e.touches[0];
+
+    if (!touchStarted && Math.abs(touch.clientY - touchStartY) > 10) {
+      touchStarted = true;
+      var srcCard = list.querySelector('[data-id="' + touchSrcId + '"]');
+      if (srcCard) srcCard.classList.add('dragging');
+    }
+
+    if (!touchStarted) return;
+    e.preventDefault();
+
+    // Find card under touch point (hide dragging card temporarily for elementFromPoint)
+    var srcCard = list.querySelector('[data-id="' + touchSrcId + '"]');
+    if (srcCard) srcCard.style.pointerEvents = 'none';
+    var elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+    if (srcCard) srcCard.style.pointerEvents = '';
+
+    list.querySelectorAll('.campaign-card.drag-over').forEach(function(c) { c.classList.remove('drag-over'); });
+    if (elemBelow) {
+      var targetCard = elemBelow.closest('.campaign-card');
+      if (targetCard && targetCard.dataset.id !== touchSrcId) {
+        targetCard.classList.add('drag-over');
+      }
+    }
+  }, { passive: false });
+
+  list.addEventListener('touchend', function() {
+    if (!touchSrcId || !touchStarted) {
+      touchSrcId = null;
+      touchStarted = false;
+      return;
+    }
+
+    var overCard = list.querySelector('.campaign-card.drag-over');
+    list.querySelectorAll('.campaign-card.dragging').forEach(function(c) { c.classList.remove('dragging'); });
+    list.querySelectorAll('.campaign-card.drag-over').forEach(function(c) { c.classList.remove('drag-over'); });
+
+    if (overCard && overCard.dataset.id !== touchSrcId) {
+      applyReorder(touchSrcId, overCard.dataset.id);
+    }
+
+    touchSrcId = null;
+    touchStarted = false;
+  });
+
+  function applyReorder(srcId, targetId) {
+    var cards = list.querySelectorAll('.campaign-card');
+    var ids = [];
+    cards.forEach(function(c) { ids.push(c.dataset.id); });
+
+    var srcIdx = ids.indexOf(srcId);
+    var targetIdx = ids.indexOf(targetId);
+    if (srcIdx === -1 || targetIdx === -1) return;
+
+    ids.splice(srcIdx, 1);
+    ids.splice(targetIdx, 0, srcId);
+
+    saveCardOrder(ids);
+    render();
+    showToast('並び順を保存しました');
+  }
+})();
+
+// Sort reset button
+document.getElementById('sort-reset-btn').addEventListener('click', function() {
+  clearCardOrder();
+  render();
+  showToast('自動ソートに戻しました');
 });
 
 // Init
